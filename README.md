@@ -32,7 +32,7 @@ import { ApolloLink } from 'apollo-link';
 import perf from '@react-native-firebase/perf';
 
 // Add the import for this library
-import createFPMLink from 'apollo-link-react-native-firebase-perf';
+import createFPMLink from 'react-native-firebase-perf-apollo-link';
 
 // ...
 ApolloLink.from([

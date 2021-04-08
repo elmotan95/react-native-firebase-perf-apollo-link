@@ -1,3 +1,4 @@
+/* tslint:disable:max-line-length */
 import { ApolloLink } from '@apollo/client';
 import formatMessage from './formatMessage';
 import logging from './logging';
