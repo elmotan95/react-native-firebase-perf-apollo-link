@@ -1,4 +1,4 @@
-import { ApolloLink } from 'apollo-link';
+import { ApolloLink } from '@apollo/client';
 import formatMessage from './formatMessage';
 import logging from './logging';
 import { ReactNativeFirebase } from '@react-native-firebase/app'
