@@ -10,9 +10,10 @@ import { FirebasePerformanceTypes } from '@react-native-firebase/perf';
  *
  * @param {ReactNativeFirebase.FirebaseModuleWithStatics<FirebasePerformanceTypes.Module, FirebasePerformanceTypes.Statics>} perf - React Native Firebase Performance module
  * @param attributes - Attributes for enrich data
+ * @param headersByKey
  * @param {boolean} [debug=false] - Enable debug mode
  */
-const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<FirebasePerformanceTypes.Module, FirebasePerformanceTypes.Statics>), attributes?: Record<string, string>, debug: boolean = false) => {
+const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<FirebasePerformanceTypes.Module, FirebasePerformanceTypes.Statics>), attributes?: Record<string, string>, headersByKey?: string, debug: boolean = false) => {
   return new ApolloLink((operation, forward) => {
     if (!forward) {
       return null;
@@ -67,6 +68,32 @@ const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<Fire
 
     return forward(operation).map(result => {
       if (trace !== undefined) {
+        try {
+          if (headersByKey) {
+            const context = operation?.getContext();
+            const {
+              response: { headers },
+            } = context;
+            const value = headers.get(headersByKey)
+            if (value) {
+              if (debug) {
+                logging.log('HEADERS: '+headersByKey+' value: '+value);
+              }
+              trace?.putAttribute(headersByKey, value)
+            } else {
+              if (debug) {
+                // tslint:disable-next-line: no-console
+                console.warn('Header Key: ' + headersByKey + ' not exist')
+              }
+            }
+          }
+        } catch (e) {
+          if (debug) {
+            // tslint:disable-next-line: no-console
+            console.error('Error when getting headers by key', e);
+          }
+        }
+
         try {
           trace.stop();
           trace = undefined;
