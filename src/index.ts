@@ -9,9 +9,10 @@ import { FirebasePerformanceTypes } from '@react-native-firebase/perf';
  * Create a Firebase perf monitoring link
  *
  * @param {ReactNativeFirebase.FirebaseModuleWithStatics<FirebasePerformanceTypes.Module, FirebasePerformanceTypes.Statics>} perf - React Native Firebase Performance module
+ * @param attributes - Attributes for enrich data
  * @param {boolean} [debug=false] - Enable debug mode
  */
-const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<FirebasePerformanceTypes.Module, FirebasePerformanceTypes.Statics>), debug: boolean = false) => {
+const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<FirebasePerformanceTypes.Module, FirebasePerformanceTypes.Statics>), attributes?: Record<string, string>, debug: boolean = false) => {
   return new ApolloLink((operation, forward) => {
     if (!forward) {
       return null;
@@ -50,6 +51,12 @@ const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<Fire
       try {
         trace = perfObj.newTrace(traceName);
         trace.start();
+        if (attributes) {
+          const convertedAttributes = Object.entries(attributes)
+          convertedAttributes.map(v => {
+            trace?.putAttribute(v[0], v[1])
+          })
+        }
       } catch (e) {
         if (debug) {
           // tslint:disable-next-line: no-console
@@ -79,6 +86,7 @@ const createFPMLink = (perf: (ReactNativeFirebase.FirebaseModuleWithStatics<Fire
 
         logging.log('REQ', operation);
         logging.log('RES', result);
+        logging.log('ATTR', attributes);
 
         logging.groupEnd(...group);
       }
